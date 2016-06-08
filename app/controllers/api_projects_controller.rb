@@ -1,33 +1,19 @@
-class ApiProjectsController < BaseAPIController
-    before_filter :find_project, only: [:show, :update]
+class ApiProjectsController < APIControllerBase
 
-    before_filter only: :create do
-        unless @json.has_key?('project') and @json['project'].responds_to?(:[]) and @json['project']['name']
-            render nothing: true, status: :bad_request
-        end
-    end
-
-    before_filter only: :update do
-        unless @json.has_key?('project')
-            render nothing: true, status: :bad_request
-        end
-    end
+    VISIBLE_FIELDS = [:id, :name]
 
     def index 
-        render json: Project.all
+        @projects = Project.all
+        render json: @projects, only: VISIBLE_FIELDS, status: :ok
     end
 
     def show
-        render json: @project
+        @project = Project.find(params[:project_id])
+        render json: @project, only: VISIBLE_FIELDS, status: :ok
     end
 
     def create
 
     end
 
-    private
-        def find_project
-            @project = Project.find_by_name(params[:name])
-            render nothing: true, status: :not_found unless @project.present?
-        end
 end
