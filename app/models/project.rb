@@ -1,6 +1,6 @@
 class Project < ActiveRecord::Base
 
-    has_many :todos, dependent: :destroy
+    has_many :todos, dependent: :delete_all
 
     validates :name,
         presence: true,

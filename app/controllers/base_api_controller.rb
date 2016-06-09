@@ -1,5 +1,5 @@
 class BaseAPIController < ApplicationController
-    before_filter :parse_request, :authenticate_user_from_token!
+    skip_before_filter :parse_request, :authenticate_user_from_token!
 
     private
         def authenticate_user_from_token!
