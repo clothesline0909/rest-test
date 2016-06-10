@@ -1,6 +1,6 @@
 class Api::V1::BaseController < ActionController::Base
 
-    before_action :authenticate
+    #before_action :authenticate
 
     # Handle errors.
     rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
