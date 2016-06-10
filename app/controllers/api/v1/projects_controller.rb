@@ -1,15 +1,10 @@
-class ApiProjectsController < ApiBaseController
+class Api::V1::ProjectsController < Api::V1::BaseController
 
     VISIBLE_FIELDS = [:id, :name]
+    ALLOWED_QUERY_KEYS = [:project_name, :start_date, :end_date]
 
     def index 
-        start = params[:start_date].to_time
-        finish = params[:end_date].to_time
-        query_params = {
-            name: params[:name],
-            created_at: start..finish
-        }
-        @projects = Project.where(query_params)
+        @projects = Project.filter(params.slice(*ALLOWED_QUERY_KEYS))
         render json: @projects, only: VISIBLE_FIELDS, status: :ok
     end
 

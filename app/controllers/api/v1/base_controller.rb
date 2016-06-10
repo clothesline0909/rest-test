@@ -1,26 +1,27 @@
-class ApiBaseController < ApplicationController
+class Api::V1::BaseController < ActionController::Base
+
+    before_action :authenticate
 
     # Handle errors.
     rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
     rescue_from ActionController::ParameterMissing, with: :render_bad_request
     ActionController::Parameters.action_on_unpermitted_parameters = :raise
     rescue_from ActionController::UnpermittedParameters, with: :render_bad_request
+    rescue_from ArgumentError, with: :render_bad_request
 
     def routing_error
         render_not_found
     end
 
     private
-        def authenticate_user_from_token!
-            if !@json['api_token']
-                render nothing: true, status: :unauthorized
-            else
-                @user = nil
-                APIUser.find_each do |u|
-                    if Devise.secure_compare(u.api_token, @json['api_token'])
-                        @user = u
-                    end
-                end
+        def authenticate
+            authenticate_token || render_unauthorized
+        end
+
+        def authenticate_token
+            authenticate_with_http_token do |token, options|
+                @user = APIUser.where(api_token: token)
+                @user.present?
             end
         end
 
@@ -32,5 +33,11 @@ class ApiBaseController < ApplicationController
         # Return 400 if request was incorrectly formatted.
         def render_bad_request
             render nothing: true, status: :bad_request
+        end
+
+        # Return 401 if request is unauthorized.
+        def render_unauthorized
+            self.headers['WWW-Authenticate'] = "Token realm='Projects API'"
+            render json: "401: API token required.", status: :unauthorized
         end
 end
