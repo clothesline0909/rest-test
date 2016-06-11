@@ -8,11 +8,11 @@ class Api::V1::TodosController < Api::V1::BaseController
     end
 
     def show
-        @todo = Todo.where(project_id: params[:project_id], id: params[:todo_id])
-        if @todo.length != 0
-            render json: @todo, only: VISIBLE_FIELDS, status: :ok
-        else
+        @todo = Todo.find(params[:todo_id])
+        if @todo[:project_id] != params[:project_id].to_i
             render_not_found
+        else
+            render json: @todo, only: VISIBLE_FIELDS, status: :ok
         end
     end
 
@@ -28,6 +28,10 @@ class Api::V1::TodosController < Api::V1::BaseController
 
     def update
         @todo = Todo.find(params[:todo_id])
+        if @todo[:project_id] != params[:project_id].to_i
+            render_not_found
+            return
+        end
         @todo.assign_attributes(todo_params)
         if @todo.save
             render json: @todo, only: VISIBLE_FIELDS, status: :ok

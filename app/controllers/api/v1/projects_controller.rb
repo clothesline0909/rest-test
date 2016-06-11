@@ -15,10 +15,7 @@ class Api::V1::ProjectsController < Api::V1::BaseController
 
     def create
         @project = Project.new(project_params)
-        @existing_project = Project.find_by_name(params[:project][:name])
-        if @existing_project.present?
-            render nothing: true, status: :conflict
-        elsif @project.save
+        if @project.save
             render json: @project, only: VISIBLE_FIELDS, status: :created
         else
             render nothing: true, status: :bad_request
