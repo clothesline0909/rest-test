@@ -1,6 +1,11 @@
-require 'spec_helper'
+require 'rails_helper'
 
 RSpec.describe Api::V1::TodosController, type: :controller do
+	include AuthenticationHelper
+
+	before :each do
+		set_auth_token
+	end
 	
 	describe "GET #index" do
 		before :each do
